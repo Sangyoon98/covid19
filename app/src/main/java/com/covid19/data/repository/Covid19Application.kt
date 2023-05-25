@@ -1,4 +1,4 @@
-package com.covid19.data
+package com.covid19.data.repository
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
