@@ -16,6 +16,9 @@
         tools:targetApi="tiramisu"
         android:usesCleartextTraffic="true"
         android:enableOnBackInvokedCallback="true">
+        <meta-data
+            android:name="com.naver.maps.map.CLIENT_ID"
+            android:value="1dkgl7pg55" />
         <activity android:name=".presentation.view.MainActivity"/>
         <activity
             android:name=".presentation.view.SplashScreen"
