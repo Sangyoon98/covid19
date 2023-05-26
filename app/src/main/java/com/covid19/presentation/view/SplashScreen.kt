@@ -22,6 +22,7 @@ class SplashScreen : AppCompatActivity() {
         mBinding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // ProgressBar Value
         lifecycleScope.launch {
             viewModel.updateProgress()
             viewModel.progress.collectLatest { progress ->

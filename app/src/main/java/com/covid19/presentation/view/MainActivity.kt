@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Naver Map Fragment
         val fm = supportFragmentManager
         val mapFragment = fm.findFragmentById(R.id.map_fragment) as MapFragment?
             ?: MapFragment.newInstance().also {
@@ -51,20 +52,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         this.naverMap = naverMap
         naverMap.locationSource = locationSource
 
+        // 현위치 버튼 클릭 리스너
         binding.floatingActionButton.setOnClickListener {
             naverMap.locationTrackingMode = LocationTrackingMode.Follow
         }
 
+        // Bottom Sheet Behavior
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
         bottomSheetBehavior.state = STATE_COLLAPSED
 
+        // Room DB 데이터 읽기
         viewModel.loadCentersList()
         viewModel.centersListFlow
             .onEach { result ->
                 result.forEach { centers ->
+                    // 마커 설정
                     val marker = Marker()
                     marker.position = LatLng(centers.lat.toDouble(), centers.lng.toDouble())
 
+                    // centerType 종류별 마커 색상 설정
                     when (centers.centerType) {
                         "중앙/권역" -> marker.iconTintColor = Color.GREEN
                         "지역" -> marker.iconTintColor = Color.BLUE
@@ -73,6 +79,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     marker.map = naverMap
 
+                    // 마커 클릭 리스너
                     marker.setOnClickListener {
                         binding.address.text = centers.address
                         binding.centerName.text = centers.centerName
@@ -80,11 +87,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         binding.phoneNumber.text = centers.phoneNumber
                         binding.updatedAt.text = centers.updatedAt
 
+                        // 카메라 이동
                         val cameraUpdate = CameraUpdate
                             .scrollAndZoomTo(marker.position, 15.0)
                             .animate(CameraAnimation.Easing)
                         naverMap.moveCamera(cameraUpdate)
 
+                        // Bottom Sheet Visible / Gone
                         if (bottomSheetBehavior.state == STATE_EXPANDED) {
                             bottomSheetBehavior.state = STATE_COLLAPSED
                         } else {
@@ -98,6 +107,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             .launchIn(lifecycleScope)
     }
 
+    // Permission Check
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (locationSource.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
             if (!locationSource.isActivated) { // 권한 거부됨

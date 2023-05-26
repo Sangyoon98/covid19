@@ -21,6 +21,7 @@ class MainActivityViewModel @Inject constructor(
     private val _centersListFlow = MutableSharedFlow<List<Centers>>()
     val centersListFlow: SharedFlow<List<Centers>> = _centersListFlow
 
+    // Room DB 데이터 읽기
     fun loadCentersList() {
         viewModelScope.launch {
             val result = roomDatabase.centersDao().getAll()
