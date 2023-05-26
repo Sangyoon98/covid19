@@ -42,7 +42,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mapFragment.getMapAsync(this)
         locationSource = FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
-
     }
 
     override fun onDestroy() {
@@ -53,6 +52,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(naverMap: NaverMap) {
         this.naverMap = naverMap
         naverMap.locationSource = locationSource
+
+        binding.floatingActionButton.setOnClickListener {
+            naverMap.locationTrackingMode = LocationTrackingMode.Follow
+        }
 
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
         bottomSheetBehavior.state = STATE_COLLAPSED
@@ -93,9 +96,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         }
-
-        val uiSettings = naverMap.uiSettings
-        uiSettings.isLocationButtonEnabled = true
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
