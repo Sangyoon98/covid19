@@ -39,6 +39,8 @@ class SplashScreenViewModel @Inject constructor(
                 for (j in 0..9) {
                     roomDatabase.centersDao().insert(result.data[j])
                 }
+
+                //delay(200)
             }
             isSaveComplete = true
             Log.d("test", "saveComplete")
@@ -47,16 +49,23 @@ class SplashScreenViewModel @Inject constructor(
 
     private fun progressCount() {
         viewModelScope.launch {
+            var delayed = false
             while (_progress.value < 100) {
                 if (_progress.value < 80) {
-                    _progress.value += 1
                     delay(20)
-                } else if (_progress.value >= 80 && !isSaveComplete) {
                     _progress.value += 1
+                }
+                else if (!isSaveComplete && _progress.value == 80) {
+                    delay(20)
+                    delayed = true
+                }
+                else if (isSaveComplete && _progress.value >= 80 && !delayed) {
+                    delay(20)
+                    _progress.value += 1
+                }
+                else if (isSaveComplete && _progress.value >= 80 && delayed) {
                     delay(4)
-                } else if (_progress.value >= 80 && isSaveComplete) {
                     _progress.value += 1
-                    delay(20)
                 }
             }
         }

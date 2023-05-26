@@ -3,11 +3,9 @@ package com.covid19.presentation.view
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.covid19.R
-import com.covid19.data.repository.CentersDatabase
 import com.covid19.databinding.ActivityMainBinding
 import com.covid19.presentation.viewmodel.MainActivityViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -20,7 +18,6 @@ import com.naver.maps.map.util.FusedLocationSource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
