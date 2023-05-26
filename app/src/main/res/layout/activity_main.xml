@@ -19,8 +19,8 @@
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="350dp"
-        android:backgroundTint="@color/white"
         android:elevation="10dp"
+        android:backgroundTint="?attr/colorSurface"
         app:behavior_peekHeight="0dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 

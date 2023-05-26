@@ -18,6 +18,8 @@ import com.naver.maps.map.*
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.util.FusedLocationSource
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -25,7 +27,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private var mBinding: ActivityMainBinding? = null
     private val binding get() = mBinding!!
     private val viewModel: MainActivityViewModel by viewModels()
-    private val roomDatabase: CentersDatabase = CentersDatabase.getInstance(this)!!
     private lateinit var locationSource: FusedLocationSource
     private lateinit var naverMap: NaverMap
 
@@ -60,49 +61,49 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
         bottomSheetBehavior.state = STATE_COLLAPSED
 
-        lifecycleScope.launch {
-            val result = roomDatabase.centersDao().getAll()
+        viewModel.loadCentersList()
+        viewModel.centersListFlow
+            .onEach { result ->
+                result.forEach { centers ->
+                    val marker = Marker()
+                    marker.position = LatLng(centers.lat.toDouble(), centers.lng.toDouble())
 
-            result.forEach {centers ->
-                val marker = Marker()
-                marker.position = LatLng(centers.lat.toDouble(), centers.lng.toDouble())
-                if (centers.centerType == "중앙/권역")
-                    marker.iconTintColor = Color.BLUE
-                else
-                    marker.iconTintColor = Color.GREEN
-                marker.map = naverMap
-                Log.d("test", "$centers")
-
-                marker.setOnClickListener {
-                    binding.address.text = centers.address
-                    binding.centerName.text = centers.centerName
-                    binding.facilityName.text = centers.facilityName
-                    binding.phoneNumber.text = centers.phoneNumber
-                    binding.updatedAt.text = centers.updatedAt
-
-                    val cameraUpdate = CameraUpdate
-                        .scrollAndZoomTo(marker.position, 15.0)
-                        .animate(CameraAnimation.Easing)
-                    naverMap.moveCamera(cameraUpdate)
-                    Log.d("test", "marker clicked")
-
-                    if (bottomSheetBehavior.state == STATE_EXPANDED) {
-                        bottomSheetBehavior.state = STATE_COLLAPSED
-                    } else {
-                        bottomSheetBehavior.state = STATE_EXPANDED
+                    if (centers.centerType == "중앙/권역") {
+                        marker.iconTintColor = Color.BLUE
+                    }
+                    else {
+                        marker.iconTintColor = Color.GREEN
                     }
 
-                    false
+                    marker.map = naverMap
+
+                    marker.setOnClickListener {
+                        binding.address.text = centers.address
+                        binding.centerName.text = centers.centerName
+                        binding.facilityName.text = centers.facilityName
+                        binding.phoneNumber.text = centers.phoneNumber
+                        binding.updatedAt.text = centers.updatedAt
+
+                        val cameraUpdate = CameraUpdate
+                            .scrollAndZoomTo(marker.position, 15.0)
+                            .animate(CameraAnimation.Easing)
+                        naverMap.moveCamera(cameraUpdate)
+
+                        if (bottomSheetBehavior.state == STATE_EXPANDED) {
+                            bottomSheetBehavior.state = STATE_COLLAPSED
+                        } else {
+                            bottomSheetBehavior.state = STATE_EXPANDED
+                        }
+
+                        false
+                    }
                 }
             }
-        }
+            .launchIn(lifecycleScope)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>,
-                                            grantResults: IntArray) {
-        if (locationSource.onRequestPermissionsResult(requestCode, permissions,
-                grantResults)) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        if (locationSource.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
             if (!locationSource.isActivated) { // 권한 거부됨
                 naverMap.locationTrackingMode = LocationTrackingMode.None
             }
