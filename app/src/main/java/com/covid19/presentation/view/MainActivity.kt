@@ -65,11 +65,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     val marker = Marker()
                     marker.position = LatLng(centers.lat.toDouble(), centers.lng.toDouble())
 
-                    if (centers.centerType == "중앙/권역") {
-                        marker.iconTintColor = Color.BLUE
-                    }
-                    else {
-                        marker.iconTintColor = Color.GREEN
+                    when (centers.centerType) {
+                        "중앙/권역" -> marker.iconTintColor = Color.GREEN
+                        "지역" -> marker.iconTintColor = Color.BLUE
+                        else -> marker.iconTintColor = Color.YELLOW
                     }
 
                     marker.map = naverMap
